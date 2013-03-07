@@ -31,6 +31,49 @@ module WithinHelpers
 end
 World(WithinHelpers)
 
+
+#--------------------
+When /^I fill in "([^"]*)" with the id of "([^"]*)"$/ do |selector, title|
+  article = Content.find_by_title(title)
+  step %{I fill in "#{selector}" with "#{article.id}"}
+end
+
+Given /^the user "(.*?)" exist$/ do |username|
+  User.create!({:login => username,
+                :password => "aaaaaaaa",
+                :email => "#{username}@snow.com",
+                :profile_id => 2,
+                :name => username,
+                :state => 'active'
+               })
+end
+
+Given /^I am logged into the admin panel as "(.*?)"$/ do |username|
+  visit '/accounts/login'
+  fill_in 'user_login', :with => username
+  fill_in 'user_password', :with => 'aaaaaaaa'
+  click_button 'Login'
+  if page.respond_to? :should
+    page.should have_content('Login successful')
+  else
+    assert page.has_content?('Login successful')
+  end
+end
+
+
+When /^there is article published by "([^"]*)" with title "([^"]*)"$/ do |login, title|
+  user = User.find_by_login(login)
+  article = Article.get_or_build_article(nil)
+  article.user = user
+  article.title = title
+  article.body = "Some interesting content"
+  article.save
+  article.comments.build(:body => "Comment", :author => login)
+  article.save
+end
+#--------------------
+
+
 Given /^the blog is set up$/ do
   Blog.default.update_attributes!({:blog_name => 'Teh Blag',
                                    :base_url => 'http://localhost:3000'});
@@ -44,15 +87,7 @@ Given /^the blog is set up$/ do
 end
 
 And /^I am logged into the admin panel$/ do
-  visit '/accounts/login'
-  fill_in 'user_login', :with => 'admin'
-  fill_in 'user_password', :with => 'aaaaaaaa'
-  click_button 'Login'
-  if page.respond_to? :should
-    page.should have_content('Login successful')
-  else
-    assert page.has_content?('Login successful')
-  end
+  step %{I am logged into the admin panel as "admin"}
 end
 
 # Single-line step scoper
