@@ -7,11 +7,13 @@ Feature: Merge an article to another article
     Given the blog is set up
     And the user "user_A" exist
     And the user "user_B" exist
-    And I am logged into the admin panel
+    And I am logged into the admin panel as "user_A"
     And I am on the new article page
     And I fill in "article_title" with "Foobar_A"
     And I fill in "article__body_and_extended_editor" with "Lorem Ipsum A"
     And I press "Publish"
+    And I follow "Log out"
+    And I am logged into the admin panel as "user_B"
     And I am on the new article page
     And I fill in "article_title" with "Foobar_B"
     And I fill in "article__body_and_extended_editor" with "Lorem Ipsum B"
@@ -24,7 +26,7 @@ Feature: Merge an article to another article
     Then I should not see "Merge Articles"
 
   Scenario: Admin merge article aaa to article bbb
-    Given I am on the admin panel home page
+    Given I am logged into the admin panel
     And I go to edit article with title "Foobar_A"
     When I fill in "merge_with" with the id of "Foobar_B"
     And I press "Merge"

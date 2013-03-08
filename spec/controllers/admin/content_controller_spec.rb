@@ -670,5 +670,12 @@ describe Admin::ContentController do
       end
 
     end
+
+    describe 'merge action' do
+      it 'should redirect to index' do
+        post :merge, :merge_with => 7, :id => 8
+        response.should redirect_to('/admin/content')
+      end
+    end
   end
 end
