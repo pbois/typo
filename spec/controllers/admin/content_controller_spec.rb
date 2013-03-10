@@ -607,6 +607,23 @@ describe Admin::ContentController do
       end
     end
 
+    describe 'merge_with action' do
+      before do
+        @mock_article = mock_model(Article, {}).as_null_object
+      end
+
+      it 'should call merge_with on the article' do
+        Article.stub(:find).and_return(@mock_article)
+        @mock_article.should_receive(:merge_with)
+        post :merge_with
+      end
+
+      it 'should redirect to index' do
+        Article.stub(:find).and_return(@mock_article)
+        post :merge_with
+        response.should redirect_to(:action => 'index')
+      end
+    end
   end
 
   describe 'with publisher connection' do
@@ -671,10 +688,21 @@ describe Admin::ContentController do
 
     end
 
-    describe 'merge action' do
+    describe 'merge_with action' do
+      before do
+        @mock_article = mock_model(Article, {}).as_null_object
+      end
+
+      it 'should not call merge on the article' do
+        Article.stub(:find).and_return(@mock_article)
+        @mock_article.should_not_receive(:merge_with)
+        post :merge_with
+      end
+
       it 'should redirect to index' do
-        post :merge, :merge_with => 7, :id => 8
-        response.should redirect_to('/admin/content')
+        Article.stub(:find).and_return(@mock_article)
+        post :merge_with
+        response.should redirect_to(:action => 'index')
       end
     end
   end

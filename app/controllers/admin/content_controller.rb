@@ -113,8 +113,12 @@ class Admin::ContentController < Admin::BaseController
     render :text => nil
   end
 
-  def merge
-    return(redirect_to :action => 'index')
+  def merge_with
+    if current_user.admin?
+      @article = Article.find(params[:id])
+      @article.merge_with(params[:merge_with])
+    end
+    redirect_to :action => 'index'
   end
 
   protected
