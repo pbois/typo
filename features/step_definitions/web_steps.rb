@@ -33,10 +33,22 @@ World(WithinHelpers)
 
 
 #--------------------
-When /^I fill in "([^"]*)" with the id of "([^"]*)"$/ do |selector, title|
-  article = Content.find_by_title(title)
+When /^I fill in "([^"]*)" with the id of the article "([^"]*)"$/ do |selector, title|
+  article = Article.find_by_title(title)
   step %{I fill in "#{selector}" with "#{article.id}"}
 end
+
+
+Then /^article "(.*?)" should contain its own text and the text of the "(.*?)" article$/ do |title_article_a, title_article_b|
+  article_a = Article.find_by_title(title_article_a)
+  article_b = Article.find_by_title(title_article_b)
+  text_a = article_a.body
+  text_b = article_b.body
+  new_article = article_a.merge_with(article_b)
+  new_article.body.should contain(text_a)
+  new_article.body.should contain(text_b)
+end
+
 
 Given /^the user "(.*?)" exist$/ do |username|
   User.create!({:login => username,
